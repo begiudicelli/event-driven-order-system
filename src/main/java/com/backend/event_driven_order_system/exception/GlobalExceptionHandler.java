@@ -1,5 +1,7 @@
 package com.backend.event_driven_order_system.exception;
 
+import com.backend.event_driven_order_system.dto.responses.ErrorResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -10,46 +12,103 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<Map<String, Object>> handleBadCredentials(BadCredentialsException ex) {
-        return buildError(HttpStatus.UNAUTHORIZED, "Email ou senha inválidos");
+    public ResponseEntity<ErrorResponse> handleBadCredentials(
+            BadCredentialsException ex,
+            HttpServletRequest request
+    ) {
+        return buildError(
+                HttpStatus.UNAUTHORIZED,
+                "Authentication failed",
+                "Email ou senha inválidos",
+                request,
+                List.of()
+        );
     }
 
     @ExceptionHandler(DisabledException.class)
-    public ResponseEntity<Map<String, Object>> handleDisabled(DisabledException ex) {
-        return buildError(HttpStatus.FORBIDDEN, "Usuário desativado");
+    public ResponseEntity<ErrorResponse> handleDisabled(
+            DisabledException ex,
+            HttpServletRequest request
+    ) {
+        return buildError(
+                HttpStatus.FORBIDDEN,
+                "Access denied",
+                "Usuário desativado",
+                request,
+                List.of()
+        );
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorResponse> handleValidation(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest request
+    ) {
+
         List<String> errors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
                 .toList();
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
-                "timestamp", LocalDateTime.now().toString(),
-                "status", HttpStatus.BAD_REQUEST.value(),
-                "errors", errors
-        ));
+        return buildError(
+                HttpStatus.BAD_REQUEST,
+                "Validation failed",
+                "Erro de validação nos campos enviados",
+                request,
+                errors
+        );
+    }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleEmailExists(
+            EmailAlreadyExistsException ex,
+            HttpServletRequest request
+    ) {
+        return buildError(
+                HttpStatus.CONFLICT,
+                "Conflict",
+                ex.getMessage(),
+                request,
+                List.of()
+        );
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleGeneric(Exception ex) {
-        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno no servidor");
+    public ResponseEntity<ErrorResponse> handleGeneric(
+            Exception ex,
+            HttpServletRequest request
+    ) {
+        return buildError(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Internal server error",
+                "Erro interno no servidor",
+                request,
+                List.of()
+        );
     }
 
-    private ResponseEntity<Map<String, Object>> buildError(HttpStatus status, String message) {
-        return ResponseEntity.status(status).body(Map.of(
-                "timestamp", LocalDateTime.now().toString(),
-                "status", status.value(),
-                "error", message
-        ));
+    private ResponseEntity<ErrorResponse> buildError(
+            HttpStatus status,
+            String error,
+            String message,
+            HttpServletRequest request,
+            List<String> details
+    ) {
+        ErrorResponse response = new ErrorResponse(
+                LocalDateTime.now(),
+                status.value(),
+                error,
+                message,
+                request.getRequestURI(),
+                details
+        );
+
+        return ResponseEntity.status(status).body(response);
     }
 }

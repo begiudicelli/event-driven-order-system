@@ -4,6 +4,7 @@ import com.backend.event_driven_order_system.dto.requests.RegisterRequest;
 import com.backend.event_driven_order_system.dto.responses.RegisterResponse;
 import com.backend.event_driven_order_system.entity.User;
 import com.backend.event_driven_order_system.enums.Role;
+import com.backend.event_driven_order_system.exception.EmailAlreadyExistsException;
 import com.backend.event_driven_order_system.repository.UserRepository;
 import com.backend.event_driven_order_system.security.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,7 +34,7 @@ public class AuthService {
 
     public RegisterResponse register(RegisterRequest request) {
         if (userRepository.findByEmail(request.email()).isPresent()) {
-            throw new RuntimeException("Email já está em uso");
+            throw new EmailAlreadyExistsException("Email já está em uso");
         }
 
         User user = new User();
