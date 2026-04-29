@@ -34,6 +34,6 @@ spring:
 logging:
   level:
     root: WARN
-    com.seuprojeto: INFO
+    com.event_driven_order_system: INFO
     org.springframework.web: INFO
     org.hibernate.SQL: WARN

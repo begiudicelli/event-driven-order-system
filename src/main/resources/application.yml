@@ -5,7 +5,25 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
 
   flyway:
     enabled: true
+    out-of-order: false
+    validate-on-migrate: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: when-authorized
+  info:
+    app:
+      name: ${spring.application.name}
+      version: @project.version@
