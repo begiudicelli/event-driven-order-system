@@ -1,0 +1,39 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    hikari:
+      initialization-fail-timeout: 60000
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  flyway:
+    connect-retries: 10
+    connect-retries-interval: 5s
+    out-of-order: false
+    validate-on-migrate: true
+
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASSWORD}
+    listener:
+      simple:
+        acknowledge-mode: manual
+        retry:
+          enabled: true
+          initial-interval: 2000ms
+          max-attempts: 5
+          multiplier: 2.0
+
+logging:
+  level:
+    root: WARN
+    com.seuprojeto: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: WARN
