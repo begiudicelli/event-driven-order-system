@@ -9,6 +9,17 @@ Backend desenvolvido com Spring Boot para gerenciamento de pedidos utilizando ar
 - PostgreSQL
 - RabbitMQ
 
-## Status
 
+## Rodar projeto
+
+### Development
+make dev
+
+### Full Docker environment
+make docker
+
+### Tests
+make test
+
+## Status
 Em desenvolvimento      
