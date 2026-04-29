@@ -37,3 +37,7 @@ logging:
     com.event_driven_order_system: INFO
     org.springframework.web: INFO
     org.hibernate.SQL: WARN
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 3600000

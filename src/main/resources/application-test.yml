@@ -23,3 +23,7 @@ logging:
   level:
     root: WARN
     com.event_driven_order_system: DEBUG
+
+jwt:
+  secret: test-secret-key-fixa-para-testes-deterministicos-xpto
+  expiration: 3600000

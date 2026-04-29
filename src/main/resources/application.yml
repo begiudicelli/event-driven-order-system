@@ -27,3 +27,7 @@ management:
     app:
       name: ${spring.application.name}
       version: @project.version@
+
+jwt:
+  secret: ${JWT_SECRET:fallback-secret-trocar-em-producao-minimo-256bits}
+  expiration: 3600000
